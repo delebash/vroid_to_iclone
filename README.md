@@ -99,5 +99,5 @@ iClone 7
 
 10) You are done.
 
-Note:  Animation will not work yet as I have not added that to the Vrm_to_3DXchange._bone_map.3dxProfile yet.  Still some fine tuning.  You can watch Freedoms video he demonstrates how to setup animation in 3DXchange for your character.  You can make these changes in 3DXchange after you load Characterization File.  Any changes you make that work for you click Save next to the Characterization Profile.  You can save it as a new name and load this profile or you can just overwrite the existing profile file you loaded.
+Note:  Animation will not work but morphs will as I have not added that to the Vrm_to_3DXchange._bone_map.3dxProfile yet.  Still some fine tuning.  You can watch Freedoms video he demonstrates how to setup animation in 3DXchange for your character.  You can make these changes in 3DXchange after you load Characterization File.  Any changes you make that work for you click Save next to the Characterization Profile.  You can save it as a new name and load this profile or you can just overwrite the existing profile file you loaded.
 
