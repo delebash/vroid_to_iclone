@@ -1,8 +1,8 @@
 # PyCharm
-import pydevd_pycharm
-
-pydevd_pycharm.settrace('127.0.0.1', port=12345, stdoutToServer=False,
-                        stderrToServer=False)
+# import pydevd_pycharm
+#
+# pydevd_pycharm.settrace('127.0.0.1', port=12345, stdoutToServer=False,
+#                         stderrToServer=False)
 import RLPy
 import PySide2
 from PySide2 import *
@@ -10,13 +10,15 @@ from PySide2.shiboken2 import wrapInstance
 from PySide2.QtCore import QThread
 from PySide2.QtCore import *
 from PySide2.QtWidgets import *
-from PySide2.QtWidgets import QWidget
+from PySide2.QtWidgets import QWidget, QFileDialog
 
 from subprocess import Popen
 
 avatar = None
 Xchange_path = "D:\Program Files\Reallusion\iClone 3DXchange 7\Bin\iClone3DXchange.exe"
+# Xchange_path = "C:\Program Files\Reallusion\iClone 3DXchange 7\Bin\iClone3DXchange.exe"
 
+texture_folder = None
 
 class App:
     """GUI Application using PySide2 widgets"""
@@ -45,7 +47,7 @@ class App:
         self.import_3DXchange_button.clicked.connect(self.import_3dxchange)
         self.mocap_layout.addWidget(self.import_3DXchange_button)
 
-        self.update_character_iClone_button = QtWidgets.QPushButton("Update character in iClone")
+        self.update_character_iClone_button = QtWidgets.QPushButton("Select texture folder and update")
         self.update_character_iClone_button.clicked.connect(self.update_character_iClone)
         self.mocap_layout.addWidget(self.update_character_iClone_button)
 
@@ -68,6 +70,11 @@ class App:
 
     def update_character(self):
         global avatar
+        global texture_folder
+
+        texture_folder = QFileDialog.getExistingDirectory()
+        self.info.append("Texture folder path   " + texture_folder)
+
         selection_list = RLPy.RScene.GetSelectedObjects()
         if len(selection_list) > 0:
             for object in selection_list:  # find first avatar
@@ -98,7 +105,7 @@ class App:
                     print(
                         "   Material_name   " + material + "   Mesh_name  " + mesh_name + "   Image_name  " + image_name)
 
-                image_file = "D:/VroidtoIclone/Shibu/tex_shibu_by_Dan/" + image_name + ".png"
+                image_file = texture_folder + "/" + image_name + ".png"
                 result = material_component.LoadImageToTexture(mesh_name, material, texture_channel, image_file)
 
 
