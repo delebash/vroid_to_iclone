@@ -1,3 +1,8 @@
+# PyCharm
+# import pydevd_pycharm
+#
+# pydevd_pycharm.settrace('127.0.0.1', port=12345, stdoutToServer=False,
+#                         stderrToServer=False)
 import RLPy
 from PySide2.shiboken2 import wrapInstance
 from PySide2.QtCore import QThread
@@ -8,6 +13,7 @@ from PySide2.QtCore import *
 from subprocess import Popen
 
 avatar = None
+Xchange_path = None
 
 class App:
     """GUI Application using PySide2 widgets"""
@@ -27,6 +33,10 @@ class App:
         self.info = QtWidgets.QTextEdit()
         self.mocap_layout.addWidget(self.info)
 
+        self.path_3DXchange_button = QtWidgets.QPushButton("Set path to 3DXchange")
+        self.path_3DXchange_button.clicked.connect(self.path_3dxchange)
+        self.mocap_layout.addWidget(self.path_3DXchange_button)
+
         self.import_3DXchange_button = QtWidgets.QPushButton("Import fbx to 3DXchange")
         self.import_3DXchange_button.clicked.connect(self.import_3dxchange)
         self.mocap_layout.addWidget(self.import_3DXchange_button)
@@ -37,9 +47,17 @@ class App:
 
         return
 
+    def path_3dxchange(self):
+        global Xchange_path
+        Xchange_path = RLPy.RUi.OpenFileDialog("File(*.*)")
+        self.info.setPlainText(Xchange_path)
+
     def import_3dxchange(self):
-        Popen(["D:\Program Files\Reallusion\iClone 3DXchange 7\Bin\iClone3DXchange.exe",
-               "D:\VroidtoIclone\Shibu\shibu.fbx"])
+        global Xchange_path
+        file_path = RLPy.RUi.OpenFileDialog("File(*.*)")
+        self.info.append(file_path)
+        Popen([Xchange_path,
+               file_path])
 
     def update_character_iClone(self):
         self.update_character()
@@ -51,9 +69,9 @@ class App:
         selection_list = RLPy.RScene.GetSelectedObjects()
         if len(selection_list) > 0:
             for object in selection_list:  # find first avatar
-                # object_type = object.GetType()
-                # if object_type == RLPy.EObjectType_Avatar:
-                    avatar = object[0]
+                object_type = object.GetType()
+                if object_type == RLPy.EObjectType_Avatar:
+                    avatar = object
 
         if avatar is None:
             msgBox = QMessageBox()
@@ -62,19 +80,29 @@ class App:
             msgBox.exec()
             return
 
-        # material_component = avatar.GetMaterialComponent()
-        # mesh_list = avatar.GetMeshNames()
-        # texture_channel = RLPy.EMaterialTextureChannel_Diffuse
-        #
-        # for mesh_name in mesh_list:
-        #     # print(mesh_name)
-        #     material_list = material_component.GetMaterialNames(mesh_name)
-        #     for material in material_list:
-        #         material_name = "_".join(material.split("_")[:-1])  # remove characters after last _
-        #         print("   Material_name   " + material + "   Mesh_name  " + mesh_name)
+        material_component = avatar.GetMaterialComponent()
+        mesh_list = avatar.GetMeshNames()
+        texture_channel = RLPy.EMaterialTextureChannel_Diffuse
+
+        for mesh_name in mesh_list:
+            # print(mesh_name)
+            material_list = material_component.GetMaterialNames(mesh_name)
+            for material in material_list:
+                substring = "_HAIR"  #hair texture png has 01 and 02 plus HAIR
+                if substring in material:
+                    image_name = image_name.replace(substring,'')
+                else:
+                    image_name = "_".join(material.split("_")[:-1])  # remove characters after last _
+                    print("   Material_name   " + material + "   Mesh_name  " + mesh_name + "   Image_name  " + image_name)
+
+
+                image_file = "D:/VroidtoIclone/Shibu/tex_shibu_by_Dan/" + image_name + ".png"
+                result = material_component.LoadImageToTexture(mesh_name, material, texture_channel, image_file)
 
     def show_dialog(self):
         self.transfer_vroid_character_dialog.Show()
+
+
 x = App()
 x.show_dialog()
 
